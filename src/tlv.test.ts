@@ -13,11 +13,11 @@ test('serialize simple TLV', () => {
 })
 
 test('parse nested TLV', () => {
-	const input = '01060102AB'
+	const input = '29060102AB'
 	const result = parse(input)
 	expect(result).toEqual([
 		{
-			tag: '01',
+			tag: '29',
 			length: 6,
 			value: [{ tag: '01', length: 2, value: 'AB' }],
 		},

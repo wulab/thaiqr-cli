@@ -4,6 +4,12 @@ type Tlv = {
 	value: string | Tlv[]
 }
 
+type IsConstructed = (tag: string) => boolean
+const isConstructed: IsConstructed = (tag) => {
+	// Constructed tags per Thai QR Payment Standard
+	return ['29', '30', '31', '80'].includes(tag)
+}
+
 type Parse = (input: string) => Tlv[]
 const parse: Parse = (input) => {
 	if (input.length === 0) {
@@ -24,16 +30,9 @@ const parse: Parse = (input) => {
 			throw new Error(`Input too short: ${input}`)
 		}
 
-		const rawValue = restStr.slice(0, length)
+		const valueStr = restStr.slice(0, length)
+		const value = isConstructed(tag) ? parse(valueStr) : valueStr
 		const rest = restStr.slice(length)
-
-		// attempt nested parse: only accept nested if parsing the whole rawValue succeeds
-		let value: Tlv['value']
-		try {
-			value = parse(rawValue)
-		} catch {
-			value = rawValue
-		}
 
 		return [{ tag, length, value }, ...parse(rest)]
 	}
