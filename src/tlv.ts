@@ -4,37 +4,39 @@ type Tlv = {
 	value: string | Tlv[]
 }
 
-type IsConstructed = (tag: string) => boolean
-const isConstructed: IsConstructed = (tag) => {
-	// Constructed tags per Thai QR Payment Standard
-	return ['29', '30', '31', '80'].includes(tag)
+type IsConstructed = (tag: string, level?: number) => boolean
+const isConstructed: IsConstructed = (tag, level = 0) => {
+	// Constructed tags as per Thai QR Payment Standard
+	return level === 0 && ['29', '30', '31', '80'].includes(tag)
 }
 
-type Parse = (input: string) => Tlv[]
-const parse: Parse = (input) => {
-	if (input.length === 0) {
+type Parse = (payload: string, level?: number) => Tlv[]
+const parse: Parse = (payload, level = 0) => {
+	if (payload.length === 0) {
 		return []
 	} else {
-		const match = input.match(/^(\d{2})(\d{2})(.*)$/)
+		const match = payload.match(/^(\d{2})(\d{2})(.*)$/)
 		if (!match) {
-			throw new Error(`Invalid input: ${input}`)
+			throw new Error(`Invalid payload: ${payload}`)
 		}
 
 		const [, tag, lengthStr, restStr] = match
 		if (tag === undefined || lengthStr === undefined || restStr === undefined) {
-			throw new Error(`Invalid input groups: ${input}`)
+			throw new Error(`Missing tag, length, or value in payload: ${payload}`)
 		}
 
 		const length = parseInt(lengthStr, 10)
-		if (input.length < length + 4) {
-			throw new Error(`Input too short: ${input}`)
+		if (payload.length < length + 4) {
+			throw new Error(`Payload too short: ${payload}`)
 		}
 
 		const valueStr = restStr.slice(0, length)
-		const value = isConstructed(tag) ? parse(valueStr) : valueStr
+		const value = isConstructed(tag, level)
+			? parse(valueStr, level + 1)
+			: valueStr
 		const rest = restStr.slice(length)
 
-		return [{ tag, length, value }, ...parse(rest)]
+		return [{ tag, length, value }, ...parse(rest, level)]
 	}
 }
 

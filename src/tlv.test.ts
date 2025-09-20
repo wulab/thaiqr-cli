@@ -2,8 +2,8 @@ import { expect, test } from 'bun:test'
 import { parse, serialize, type Tlv } from './tlv.ts'
 
 test('parse simple TLV', () => {
-	const input = '0102AB'
-	const result = parse(input)
+	const payload = '0102AB'
+	const result = parse(payload)
 	expect(result).toEqual([{ tag: '01', length: 2, value: 'AB' }])
 })
 
@@ -13,8 +13,8 @@ test('serialize simple TLV', () => {
 })
 
 test('parse nested TLV', () => {
-	const input = '29060102AB'
-	const result = parse(input)
+	const payload = '29060102AB'
+	const result = parse(payload)
 	expect(result).toEqual([
 		{
 			tag: '29',

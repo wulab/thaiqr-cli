@@ -10,13 +10,13 @@ const main = () => {
 	try {
 		switch (command) {
 			case 'decode': {
-				const input = process.argv[3]
-				if (!input) {
-					console.error('Usage: thaiqr-cli decode <input>')
+				const payload = process.argv[3]
+				if (!payload) {
+					console.error('Usage: thaiqr-cli decode <payload>')
 					process.exit(1)
 				}
 
-				const tlvs = parse(input)
+				const tlvs = parse(payload)
 				print(tlvs)
 				break
 			}
