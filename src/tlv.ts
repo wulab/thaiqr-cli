@@ -7,7 +7,7 @@ type Tlv = {
 type IsConstructed = (tag: string, level?: number) => boolean
 const isConstructed: IsConstructed = (tag, level = 0) => {
 	// Constructed tags as per Thai QR Payment Standard
-	return level === 0 && ['29', '30', '31', '80'].includes(tag)
+	return level === 0 && ['26', '29', '30', '31', '62', '64', '80'].includes(tag)
 }
 
 type Parse = (payload: string, level?: number) => Tlv[]
