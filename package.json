@@ -3,6 +3,11 @@
 	"module": "src/index.ts",
 	"type": "module",
 	"private": true,
+	"scripts": {
+		"build": "bun build --minify --target=node --outfile=dist/thaiqr-cli.js src/index.ts",
+		"decode": "bun run src/index.ts decode",
+		"test": "bun test"
+	},
 	"devDependencies": {
 		"@types/bun": "latest"
 	},
