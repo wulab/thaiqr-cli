@@ -1,3 +1,4 @@
+import qrcode from 'qrcode-terminal'
 import { parse, print } from './tlv'
 
 const main = () => {
@@ -18,6 +19,16 @@ const main = () => {
 
 				const tlvs = parse(payload)
 				print(tlvs)
+				break
+			}
+			case 'generate': {
+				const payload = process.argv[3]
+				if (!payload) {
+					console.error('Usage: thaiqr-cli generate <payload>')
+					process.exit(1)
+				}
+
+				qrcode.generate(payload, { small: true })
 				break
 			}
 			default:
