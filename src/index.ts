@@ -1,5 +1,6 @@
+import fs from 'node:fs'
 import qrcode from 'qrcode-terminal'
-import { parse, print } from './tlv'
+import { parse, parsePrinted, print, serialize } from './tlv'
 
 const main = () => {
 	const command = process.argv[2]
@@ -21,6 +22,22 @@ const main = () => {
 				print(tlvs)
 				break
 			}
+
+			case 'encode': {
+				const path = process.argv[3]
+				if (!path) {
+					console.error('Usage: thaiqr-cli encode <file>')
+					process.exit(1)
+				}
+
+				const input = fs.readFileSync(path, 'utf-8')
+				const tlvs = parsePrinted(input)
+				const payload = serialize(tlvs)
+
+				qrcode.generate(payload, { small: true })
+				break
+			}
+
 			case 'generate': {
 				const payload = process.argv[3]
 				if (!payload) {
@@ -31,6 +48,7 @@ const main = () => {
 				qrcode.generate(payload, { small: true })
 				break
 			}
+
 			default:
 				console.error('Usage: thaiqr-cli <command>')
 				process.exit(1)

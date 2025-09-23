@@ -6,6 +6,7 @@
 	"scripts": {
 		"build": "bun build --minify --target=node --outfile=dist/thaiqr-cli.js src/index.ts",
 		"decode": "bun run src/index.ts decode",
+		"encode": "bun run src/index.ts encode",
 		"generate": "bun run src/index.ts generate",
 		"test": "bun test"
 	},

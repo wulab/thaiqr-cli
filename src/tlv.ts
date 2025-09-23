@@ -71,6 +71,39 @@ const serialize: Serialize = (tlvs) => {
 	}
 }
 
+const INDENT = '   '
+
+type ParseLine = (line: string, number: number) => Tlv | null
+const parseLine: ParseLine = (line, number) => {
+	switch (true) {
+		case /^\d{2}\s+\w.*$/.test(line): {
+			const result = line.match(/^(\d{2})\s+(\w.*)$/)
+			if (!result) {
+				throw new Error(`Invalid line: ${line}`)
+			}
+
+			const [, tag, value] = result
+			if (tag === undefined || value === undefined) {
+				throw new Error(`Missing tag or value in line: ${line}`)
+			}
+
+			return { tag, length: value.length, value }
+		}
+
+		default:
+			console.warn(`Ignoring line ${number}: ${line}`)
+			return null
+	}
+}
+
+type ParsePrinted = (input: string) => Tlv[]
+const parsePrinted: ParsePrinted = (input) => {
+	const lines = input.trim().split(/\r?\n/)
+	return lines
+		.map((line, index) => parseLine(line, index + 1))
+		.filter((tlv) => tlv !== null)
+}
+
 type Print = (tlvs: Tlv[], indent?: string) => void
 const print: Print = (tlvs, indent = '') => {
 	if (tlvs.length === 0) {
@@ -83,11 +116,11 @@ const print: Print = (tlvs, indent = '') => {
 			console.log(`${indent}${first.tag} ${first.value}`)
 		} else {
 			console.log(indent + first.tag)
-			print(first.value, `${indent}   `)
+			print(first.value, `${indent}${INDENT}`)
 		}
 
 		print(rest, indent)
 	}
 }
 
-export { parse, serialize, print, type Tlv }
+export { parse, parsePrinted, serialize, print, type Tlv }
