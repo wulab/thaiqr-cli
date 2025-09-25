@@ -1,11 +1,12 @@
 # thaiqr-cli
 
-A small CLI for working with Thai QR (TLV) data, implemented in TypeScript and designed to run with Bun.
+A small CLI for working with Thai QR (TLV) data, implemented in TypeScript and designed to run with Bun (also works with Node.js when using Bun-compatible commands).
 
 ## Requirements
 
-- Bun (recommended) — https://bun.sh
-- TypeScript ^5 (listed as a peer dependency)
+- Bun — https://bun.sh (recommended)
+- Node.js (for users who prefer Node; see notes below)
+- TypeScript ^5 (peer dependency)
 
 ## Install
 
@@ -15,39 +16,85 @@ Install dependencies with Bun:
 bun install
 ```
 
-If you prefer npm/yarn, install Bun or adapt commands to your toolchain.
+If you prefer to use npm or yarn, install dependencies with your package manager of choice. Some scripts assume Bun; see "Running without Bun" below.
 
-## Scripts
+## Quick usage
 
-The repository provides convenient scripts in `package.json`:
+After installing dependencies you can run the CLI directly with Bun or via Node if you build first.
 
-- `build` — compile and bundle the CLI using Bun: outputs to `dist/`.
-- `decode` — run the CLI's `decode` mode (invokes `src/index.ts decode`).
+Examples (using Bun):
+
+```bash
+# build the CLI bundle
+bun run build
+
+# decode a TLV payload
+bun run decode <payload>
+
+# encode an outline file into a Thai QR payload
+bun run encode path/to/outline.txt
+
+# generate a QR directly from a payload string
+bun run generate <payload>
+```
+
+Scripts from `package.json`:
+
+- `build` — compile and bundle the CLI using Bun; outputs to `dist/thaiqr-cli.js`.
+- `decode` — run `src/index.ts` in decode mode.
+- `encode` — run `src/index.ts` in encode mode.
+- `generate` — run `src/index.ts` in generate mode.
 - `test` — run the project's tests with Bun.
 
-You can run them directly with Bun or via the package manager wrappers. Examples below use Bun and npm wrappers.
+Running without Bun (Node.js users):
 
-### Examples
+1. Install dependencies with npm/yarn.
+2. Build the bundle with Bun (recommended) or run `ts-node`/`ts-node-esm` to execute TypeScript directly. Some features (scripts) expect Bun but the code itself uses ESM imports and should run under Node with minimal changes.
 
-Run tests:
+## Development
 
-```bash
-bun run test
-```
+- Source files live in `src/` and tests are in `src/*.test.ts`.
+- The project is configured as an ESM module and uses TypeScript. The `build` script uses Bun to produce a single JS bundle in `dist/`.
 
-Build the CLI (outputs `dist/index.js`):
+## Examples
 
-```bash
-bun run build
-```
-
-Run the CLI's decode command (reads stdin or arguments depending on implementation):
+Decode a TLV payload and print the human-readable outline:
 
 ```bash
-bun run decode <payload>
+bun run decode "000201..."
 ```
 
-## Development notes
+Encode an outline file into a Thai QR payload:
 
-- Source is under `src/`. Tests are in `src/*.test.ts`.
-- The project was bootstrapped with Bun; adjust scripts if you want Node.js-compatible commands.
+```bash
+bun run encode ./examples/example-outline.txt
+```
+
+Generate an ASCII QR directly from a payload string:
+
+```bash
+bun run generate "000201..."
+```
+
+## Contributing
+
+- Open an issue or PR for bugs and feature requests.
+- Keep tests passing (`bun run test`) for any changes.
+
+## License
+
+Apache License 2.0
+
+Copyright (c) 2025 Weera Wu
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import qrcode from 'qrcode-terminal'
-import { parse, parsePrinted, print, serialize } from './tlv'
+import { parse as parseOutline, serialize as toOutline } from './outline'
+import { parse as parsePayload, serialize as toPayload } from './payload'
 
 const main = () => {
 	const command = process.argv[2]
@@ -18,8 +19,8 @@ const main = () => {
 					process.exit(1)
 				}
 
-				const tlvs = parse(payload)
-				print(tlvs)
+				const tlvs = parsePayload(payload)
+				console.log(toOutline(tlvs))
 				break
 			}
 
@@ -30,11 +31,9 @@ const main = () => {
 					process.exit(1)
 				}
 
-				const input = fs.readFileSync(path, 'utf-8')
-				const tlvs = parsePrinted(input)
-				const payload = serialize(tlvs)
-
-				qrcode.generate(payload, { small: true })
+				const outline = fs.readFileSync(path, 'utf-8')
+				const tlvs = parseOutline(outline)
+				console.log(toPayload(tlvs))
 				break
 			}
 
