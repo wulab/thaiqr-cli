@@ -25,12 +25,20 @@ After installing dependencies you can run the CLI directly with Bun or via Node 
 **Usage:**
 
 ```bash
-thaiqr-cli [decode | encode | generate] [<arg> | <file> | -]
+thaiqr-cli [decode | encode | generate] [<arg> | <file> | -] [flags]
 ```
 
-- `decode [<payload> | <file> | -]` — decode a TLV payload string, file, or stdin to outline.
-- `encode [<outline> | <file> | -]` — encode an outline string, file, or stdin to TLV payload.
+- `decode [<payload> | <file> | -] [--force]` — decode a TLV payload string, file, or stdin to outline.
+  - `--force` bypasses CRC validation when decoding (use with caution).
+- `encode [<outline> | <file> | -] [--preserve-crc]` — encode an outline string, file, or stdin to TLV payload.
+  - `--preserve-crc` will keep any CRC present in the outline instead of recomputing it.
 - `generate [<payload> | <file> | -]` — generate an ASCII QR from a payload string, file, or stdin.
+
+**Notes on inputs**
+- `-` forces reading from stdin.
+- If the argument is an existing file path the file is read.
+- If an argument is given and it's not a file, it is treated as a raw data string.
+- If no argument is given and stdin is piped, the CLI reads from stdin.
 
 **Examples (using Bun):**
 
@@ -38,8 +46,11 @@ thaiqr-cli [decode | encode | generate] [<arg> | <file> | -]
 # build the CLI bundle
 bun run build
 
-# decode a TLV payload string
+# decode a TLV payload string (verifies CRC by default)
 bun run decode "000201..."
+
+# decode a TLV payload string and ignore CRC errors
+bun run decode "000201..." --force
 
 # decode a TLV payload from a file
 bun run decode path/to/payload.txt
@@ -47,8 +58,11 @@ bun run decode path/to/payload.txt
 # decode a TLV payload from stdin
 cat payload.txt | bun run decode -
 
-# encode an outline file into a Thai QR payload
+# encode an outline file into a Thai QR payload (CRC recomputed)
 bun run encode path/to/outline.txt
+
+# encode an outline but preserve an existing CRC field
+bun run encode path/to/outline.txt --preserve-crc
 
 # encode an outline from stdin
 cat outline.txt | bun run encode -
@@ -77,7 +91,9 @@ Scripts from `package.json`:
 Running without Bun (Node.js users):
 
 1. Install dependencies with npm/yarn.
-2. Build the bundle with Bun (recommended) or run `ts-node`/`ts-node-esm` to execute TypeScript directly. Some features (scripts) expect Bun but the code itself uses ESM imports and should run under Node with minimal changes.
+2. Build the bundle with Bun (recommended): `bun run build`. The produced bundle is `dist/thaiqr-cli.js`.
+3. Run the built bundle with Node: `node dist/thaiqr-cli.js <command> ...`
+   - Alternatively, run the TypeScript sources with `ts-node`/`ts-node-esm` if you prefer to avoid building, but the project is set up for bundling with Bun.
 
 ## Development
 

@@ -5,17 +5,17 @@ function match(payload: string): [tag: string, value: string, rest: string] {
 	const regex = /^(\d{2})(\d{2})(.*)$/
 	const result = payload.match(regex)
 	if (!result) {
-		throw new Error(`Invalid payload: ${payload}`)
+		throw new Error(`invalid payload: ${payload}`)
 	}
 
 	const [, tag, lengthStr, rest] = result
 	if (tag === undefined || lengthStr === undefined || rest === undefined) {
-		throw new Error(`Missing tag, length, or value in payload: ${payload}`)
+		throw new Error(`missing tag, length, or value in payload: ${payload}`)
 	}
 
 	const length = parseInt(lengthStr, 10)
 	if (payload.length < length + 4) {
-		throw new Error(`Payload too short: ${payload}`)
+		throw new Error(`payload too short: ${payload}`)
 	}
 
 	return [tag, rest.slice(0, length), rest.slice(length)]
@@ -59,6 +59,18 @@ function serialize(tlvs: Tlv[]): string {
 	}
 }
 
+function serializeWithCrc(tlvs: Tlv[]): string {
+	const basePayload = serialize(tlvs.filter(([tag]) => tag !== '63'))
+	const crc = checksum(basePayload + '6304')
+
+	const crcTag = tlvs.find(([tag]) => tag === '63')
+	if (crcTag && crcTag[1] !== crc) {
+		console.warn('warning: existing CRC was replaced with a computed CRC')
+	}
+
+	return basePayload + '6304' + crc
+}
+
 function validate(payload: string): boolean {
 	const tlvs = parse(payload)
 	const crcTag = tlvs.find(([tag]) => tag === '63')
@@ -69,4 +81,4 @@ function validate(payload: string): boolean {
 	return crcTag[1] === checksum(basePayload + '6304')
 }
 
-export { parse, serialize, validate }
+export { parse, serialize, validate, serializeWithCrc }
