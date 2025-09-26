@@ -22,20 +22,48 @@ If you prefer to use npm or yarn, install dependencies with your package manager
 
 After installing dependencies you can run the CLI directly with Bun or via Node if you build first.
 
-Examples (using Bun):
+**Usage:**
+
+```bash
+thaiqr-cli [decode | encode | generate] [<arg> | <file> | -]
+```
+
+- `decode [<payload> | <file> | -]` — decode a TLV payload string, file, or stdin to outline.
+- `encode [<outline> | <file> | -]` — encode an outline string, file, or stdin to TLV payload.
+- `generate [<payload> | <file> | -]` — generate an ASCII QR from a payload string, file, or stdin.
+
+**Examples (using Bun):**
 
 ```bash
 # build the CLI bundle
 bun run build
 
-# decode a TLV payload
-bun run decode <payload>
+# decode a TLV payload string
+bun run decode "000201..."
+
+# decode a TLV payload from a file
+bun run decode path/to/payload.txt
+
+# decode a TLV payload from stdin
+cat payload.txt | bun run decode -
 
 # encode an outline file into a Thai QR payload
 bun run encode path/to/outline.txt
 
+# encode an outline from stdin
+cat outline.txt | bun run encode -
+
+# encode an outline string directly
+bun run encode "00: 01\n01: 02\n..."
+
 # generate a QR directly from a payload string
-bun run generate <payload>
+bun run generate "000201..."
+
+# generate a QR from a file
+bun run generate path/to/payload.txt
+
+# generate a QR from stdin
+cat payload.txt | bun run generate -
 ```
 
 Scripts from `package.json`:
@@ -62,18 +90,24 @@ Decode a TLV payload and print the human-readable outline:
 
 ```bash
 bun run decode "000201..."
+bun run decode path/to/payload.txt
+cat payload.txt | bun run decode -
 ```
 
-Encode an outline file into a Thai QR payload:
+Encode an outline file or string into a Thai QR payload:
 
 ```bash
 bun run encode ./examples/example-outline.txt
+bun run encode "00: 01\n01: 02\n..."
+cat outline.txt | bun run encode -
 ```
 
-Generate an ASCII QR directly from a payload string:
+Generate an ASCII QR directly from a payload string or file:
 
 ```bash
 bun run generate "000201..."
+bun run generate path/to/payload.txt
+cat payload.txt | bun run generate -
 ```
 
 ## Contributing

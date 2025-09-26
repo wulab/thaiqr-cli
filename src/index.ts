@@ -3,44 +3,49 @@ import qrcode from 'qrcode-terminal'
 import { parse as parseOutline, serialize as toOutline } from './outline'
 import { parse as parsePayload, serialize as toPayload } from './payload'
 
-const main = () => {
+if (require.main === module) {
+	main()
+}
+
+async function main() {
 	const command = process.argv[2]
 	if (!command) {
-		console.error('Usage: thaiqr-cli <command>')
+		console.error(
+			'usage: thaiqr-cli [decode | encode | generate] [<arg> | <file> | -]',
+		)
 		process.exit(1)
 	}
 
 	try {
 		switch (command) {
 			case 'decode': {
-				const payload = process.argv[3]
+				const payload = await resolveInput(process.argv[3])
 				if (!payload) {
-					console.error('Usage: thaiqr-cli decode <payload>')
+					console.error('usage: thaiqr-cli decode [<payload> | <file> | -]')
 					process.exit(1)
 				}
 
 				const tlvs = parsePayload(payload)
-				console.log(toOutline(tlvs))
+				process.stdout.write(toOutline(tlvs))
 				break
 			}
 
 			case 'encode': {
-				const path = process.argv[3]
-				if (!path) {
-					console.error('Usage: thaiqr-cli encode <file>')
+				const outline = await resolveInput(process.argv[3])
+				if (!outline) {
+					console.error('usage: thaiqr-cli encode [<outline> | <file> | -]')
 					process.exit(1)
 				}
 
-				const outline = fs.readFileSync(path, 'utf-8')
 				const tlvs = parseOutline(outline)
 				console.log(toPayload(tlvs))
 				break
 			}
 
 			case 'generate': {
-				const payload = process.argv[3]
+				const payload = await resolveInput(process.argv[3])
 				if (!payload) {
-					console.error('Usage: thaiqr-cli generate <payload>')
+					console.error('usage: thaiqr-cli generate [<payload> | <file> | -]')
 					process.exit(1)
 				}
 
@@ -49,15 +54,47 @@ const main = () => {
 			}
 
 			default:
-				console.error('Usage: thaiqr-cli <command>')
+				console.error('usage: thaiqr-cli <command>')
 				process.exit(1)
 		}
 	} catch (err) {
-		console.error('Error:', (err as Error).message)
+		console.error('error:', (err as Error).message)
 		process.exit(2)
 	}
 }
 
-if (require.main === module) {
-	main()
+// Behaviour:
+// - `command -` reads data from stdin
+// - `command <file>` reads data from the given file path (if it exists)
+// - `command <data>` treats the arg as a raw data string
+// - `command` with no arg will read from stdin if piped, otherwise show usage
+async function resolveInput(
+	arg: string | undefined,
+): Promise<string | undefined> {
+	let data: string | undefined
+
+	if (arg === '-') {
+		// explicit request to read from stdin
+		data = await readStdin()
+	} else if (arg && fs.existsSync(arg) && fs.statSync(arg).isFile()) {
+		// existing file path
+		data = fs.readFileSync(arg, 'utf8').trim()
+	} else if (arg) {
+		// treat as raw data string
+		data = arg
+	} else if (!process.stdin.isTTY) {
+		// no arg, but stdin is piped
+		data = await readStdin()
+	}
+
+	return data
+}
+
+async function readStdin(): Promise<string> {
+	let data = ''
+	process.stdin.setEncoding('utf8')
+	for await (const chunk of process.stdin) {
+		data += chunk
+	}
+	return data.trim()
 }
