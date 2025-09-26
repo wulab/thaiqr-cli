@@ -1,3 +1,4 @@
+import { checksum } from './crc'
 import type { Tlv } from './tlv'
 
 function match(payload: string): [tag: string, value: string, rest: string] {
@@ -58,4 +59,14 @@ function serialize(tlvs: Tlv[]): string {
 	}
 }
 
-export { parse, serialize }
+function validate(payload: string): boolean {
+	const tlvs = parse(payload)
+	const crcTag = tlvs.find(([tag]) => tag === '63')
+	if (!crcTag || typeof crcTag[1] !== 'string') return false
+	if (crcTag[1].length !== 4) return false
+
+	const basePayload = serialize(tlvs.filter(([tag]) => tag !== '63'))
+	return crcTag[1] === checksum(basePayload + '6304')
+}
+
+export { parse, serialize, validate }
