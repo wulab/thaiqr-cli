@@ -126,11 +126,28 @@ bun run generate path/to/payload.txt
 cat payload.txt | bun run generate -
 ```
 
+## Outline format
+
+Outline is the format I came up with to clearly list all tags and values found in a Thai QR code. In this format, each tag and its value appear on their own line, and tags can be nested under other tags. For each level of nesting, use three spaces for indentation. The meaning of each tag number and its specification can be found in the [Thai QR Code Payment Standard](https://www.bot.or.th/content/dam/bot/fipcs/documents/FPG/2562/ThaiPDF/25620084.pdf).
+
+Example:
+```text
+00 01
+01 12
+30
+   00 A000000677010112
+   01 099400000000000
+   02 M000000000
+   03 T000A000000000000000
+53 764
+58 TH
+63 BCCE
+```
+
 ## Contributing
 
 - Open an issue or PR for bugs and feature requests.
 - Keep tests passing (`bun run test`) for any changes.
-
 
 ## License
 
