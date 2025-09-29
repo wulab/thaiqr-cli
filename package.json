@@ -1,9 +1,11 @@
 {
 	"name": "thaiqr-cli",
+	"version": "1.0.0",
 	"module": "src/index.ts",
 	"type": "module",
 	"private": true,
 	"scripts": {
+		"prebuild": "bun ./scripts/generate-version.ts",
 		"build": "bun build --minify --target=node --outfile=dist/thaiqr-cli.js src/index.ts",
 		"decode": "bun run src/index.ts decode",
 		"encode": "bun run src/index.ts encode",

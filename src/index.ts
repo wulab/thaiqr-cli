@@ -7,6 +7,7 @@ import {
 	serializeWithCrc as toPayloadWithCrc,
 	validate,
 } from './payload'
+import { VERSION } from './version.ts'
 
 if (require.main === module) {
 	main()
@@ -32,13 +33,14 @@ async function main() {
 	const command = process.argv[2]
 	if (!command) {
 		console.error(
-			`usage: thaiqr-cli <command> [<arg> | <file> | -]
+			`usage: thaiqr-cli [command]
 
 Commands:
 
    decode    Decodes a Thai QR payload and prints its outline
    encode    Encodes an outline into a Thai QR payload
    generate  Generates a QR code from a Thai QR payload
+   version   Prints the current application version
 `,
 		)
 		process.exit(1)
@@ -99,6 +101,11 @@ Commands:
 				break
 			}
 
+			case 'version': {
+				console.log(VERSION)
+				break
+			}
+
 			default:
 				console.error('usage: thaiqr-cli <command>')
 				process.exit(1)
@@ -144,3 +151,5 @@ async function readStdin(): Promise<string> {
 	}
 	return data.trim()
 }
+
+// Note: VERSION is generated at build time into src/version.ts
