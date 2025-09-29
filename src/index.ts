@@ -14,7 +14,7 @@ if (require.main === module) {
 }
 
 /**
- * Entry point for the thaiqr-cli command-line tool.
+ * Entry point for the thaiqr command-line tool.
  *
  * Handles the following commands:
  * - `decode`: Decodes a Thai QR payload and prints its outline.
@@ -22,7 +22,7 @@ if (require.main === module) {
  * - `generate`: Generates a QR code from a Thai QR payload.
  *
  * Usage:
- *   thaiqr-cli [decode | encode | generate] [<arg> | <file> | -]
+ *   thaiqr [decode | encode | generate] [<arg> | <file> | -]
  *
  * Exit codes:
  * - 0: Success
@@ -33,9 +33,9 @@ async function main() {
 	const command = process.argv[2]
 	if (!command) {
 		console.error(
-			`usage: thaiqr-cli [command]
+			`usage: thaiqr [command]
 
-Commands:
+Available commands:
 
    decode    Decodes a Thai QR payload and prints its outline
    encode    Encodes an outline into a Thai QR payload
@@ -52,7 +52,7 @@ Commands:
 				const payload = await resolveInput(process.argv[3])
 				if (!payload) {
 					console.error(
-						'usage: thaiqr-cli decode [<payload> | <file> | -] [--force]',
+						'usage: thaiqr decode [<payload> | <file> | -] [--force]',
 					)
 					process.exit(1)
 				}
@@ -75,7 +75,7 @@ Commands:
 				const outline = await resolveInput(process.argv[3])
 				if (!outline) {
 					console.error(
-						'usage: thaiqr-cli encode [<outline> | <file> | -] [--preserve-crc]',
+						'usage: thaiqr encode [<outline> | <file> | -] [--preserve-crc]',
 					)
 					process.exit(1)
 				}
@@ -93,7 +93,7 @@ Commands:
 			case 'generate': {
 				const payload = await resolveInput(process.argv[3])
 				if (!payload) {
-					console.error('usage: thaiqr-cli generate [<payload> | <file> | -]')
+					console.error('usage: thaiqr generate [<payload> | <file> | -]')
 					process.exit(1)
 				}
 
@@ -107,7 +107,7 @@ Commands:
 			}
 
 			default:
-				console.error('usage: thaiqr-cli <command>')
+				console.error('usage: thaiqr <command>')
 				process.exit(1)
 		}
 	} catch (err) {

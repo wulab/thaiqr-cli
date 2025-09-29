@@ -3,10 +3,22 @@
 	"version": "1.0.0",
 	"module": "src/index.ts",
 	"type": "module",
-	"private": true,
+	"private": false,
+	"main": "dist/thaiqr.js",
+	"bin": {
+		"thaiqr": "bin/thaiqr"
+	},
+	"files": [
+		"dist",
+		"bin",
+		"src"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"prebuild": "bun ./scripts/generate-version.ts",
-		"build": "bun build --minify --target=node --outfile=dist/thaiqr-cli.js src/index.ts",
+		"build": "bun build --minify --target=node --outfile=dist/thaiqr.js src/index.ts",
 		"decode": "bun run src/index.ts decode",
 		"encode": "bun run src/index.ts encode",
 		"generate": "bun run src/index.ts generate",
@@ -21,5 +33,23 @@
 	},
 	"dependencies": {
 		"qrcode-terminal": "^0.12.0"
+	},
+	"license": "Apache-2.0",
+	"keywords": [
+		"thai",
+		"qr",
+		"qrcode",
+		"cli",
+		"payment",
+		"promptpay",
+		"thailand",
+		"emvco",
+		"emv"
+	],
+	"author": "Weera Wu",
+	"homepage": "https://github.com/wulab/thaiqr-cli#readme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wulab/thaiqr-cli.git"
 	}
 }

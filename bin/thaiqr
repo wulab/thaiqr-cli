@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+// Lightweight wrapper for the thaiqr package.
+// This script resolves to the built file in `dist` when present.
+
+import fs from 'node:fs'
+import path from 'node:path'
+
+const pkgRoot = path.resolve(
+	path.dirname(new URL(import.meta.url).pathname),
+	'..',
+)
+const distPath = path.join(pkgRoot, 'dist', 'thaiqr.js')
+
+if (!fs.existsSync(distPath)) {
+	console.error(
+		'Could not find built runtime for thaiqr. Please run `bun run build` to produce dist/thaiqr.js before running locally.',
+	)
+	process.exit(1)
+}
+
+// Execute the target file by spawning a node process.
+const { spawn } = await import('node:child_process')
+
+const nodeArgs = [distPath, ...process.argv.slice(2)]
+const child = spawn(process.execPath, nodeArgs, { stdio: 'inherit' })
+
+child.on('exit', (code) => process.exit(code ?? 0))
+child.on('error', (err) => {
+	console.error(err)
+	process.exit(1)
+})

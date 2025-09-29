@@ -1,6 +1,7 @@
 # thaiqr-cli
 
-A small CLI for working with Thai QR (TLV) data, implemented in TypeScript and designed to run with Bun (also works with Node.js when using Bun-compatible commands).
+A small CLI for working with Thai QR (TLV) data. The npm package name is `thaiqr-cli`, but the installed command is `thaiqr`.
+Implemented in TypeScript and designed to run with Bun (also works with Node.js when using Bun-compatible commands).
 
 ## Requirements
 
@@ -10,22 +11,32 @@ A small CLI for working with Thai QR (TLV) data, implemented in TypeScript and d
 
 ## Install
 
-Install dependencies with Bun:
+Install the published CLI from npm (recommended for users):
+
+```bash
+# install globally
+npm install -g thaiqr-cli
+
+# or run with npx without installing globally
+npx thaiqr-cli decode "000201..."
+```
+
+If you're developing the project or want to run locally from source, install dependencies with Bun:
 
 ```bash
 bun install
 ```
 
-If you prefer to use npm or yarn, install dependencies with your package manager of choice. Some scripts assume Bun; see "Running without Bun" below.
+If you prefer to use npm or yarn for development, install dependencies with your package manager of choice. Some scripts assume Bun; see "Running without Bun" below.
 
 ## Quick usage
 
-After installing dependencies you can run the CLI directly with Bun or via Node if you build first.
+After installing the package from npm you can run the CLI as the `thaiqr` command.
 
 **Usage:**
 
 ```bash
-thaiqr-cli [decode | encode | generate] [<arg> | <file> | -] [flags]
+thaiqr [decode | encode | generate] [<arg> | <file> | -] [flags]
 ```
 
 - `decode [<payload> | <file> | -] [--force]` — decode a TLV payload string, file, or stdin to outline.
@@ -40,60 +51,65 @@ thaiqr-cli [decode | encode | generate] [<arg> | <file> | -] [flags]
 - If an argument is given and it's not a file, it is treated as a raw data string.
 - If no argument is given and stdin is piped, the CLI reads from stdin.
 
-**Examples (using Bun):**
+**Examples:**
+
+Once installed from npm you can run the following directly with the installed binary:
 
 ```bash
-# build the CLI bundle
-bun run build
-
 # decode a TLV payload string (verifies CRC by default)
-bun run decode "000201..."
+thaiqr decode "000201..."
 
 # decode a TLV payload string and ignore CRC errors
-bun run decode "000201..." --force
+thaiqr decode "000201..." --force
 
 # decode a TLV payload from a file
-bun run decode path/to/payload.txt
+thaiqr decode path/to/payload.txt
 
 # decode a TLV payload from stdin
-cat payload.txt | bun run decode -
+cat payload.txt | thaiqr decode -
 
 # encode an outline file into a Thai QR payload (CRC recomputed)
-bun run encode path/to/outline.txt
+thaiqr encode path/to/outline.txt
 
 # encode an outline but preserve an existing CRC field
-bun run encode path/to/outline.txt --preserve-crc
+thaiqr encode path/to/outline.txt --preserve-crc
 
 # encode an outline from stdin
-cat outline.txt | bun run encode -
+cat outline.txt | thaiqr encode -
 
 # encode an outline string directly
-bun run encode "00: 01\n01: 02\n..."
+thaiqr encode "00: 01\n01: 02\n..."
 
 # generate a QR directly from a payload string
-bun run generate "000201..."
+thaiqr generate "000201..."
 
 # generate a QR from a file
-bun run generate path/to/payload.txt
+thaiqr generate path/to/payload.txt
 
 # generate a QR from stdin
-cat payload.txt | bun run generate -
+cat payload.txt | thaiqr generate -
 ```
 
 Scripts from `package.json`:
 
-- `build` — compile and bundle the CLI using Bun; outputs to `dist/thaiqr-cli.js`.
-- `decode` — run `src/index.ts` in decode mode.
-- `encode` — run `src/index.ts` in encode mode.
-- `generate` — run `src/index.ts` in generate mode.
+- `build` — compile and bundle the CLI using Bun; outputs to `dist/thaiqr.js`.
+- `decode` — (development script) run `src/index.ts` in decode mode.
+- `encode` — (development script) run `src/index.ts` in encode mode.
+- `generate` — (development script) run `src/index.ts` in generate mode.
 - `test` — run the project's tests with Bun.
 
-Running without Bun (Node.js users):
+Running without Bun (Node.js users / developers):
 
 1. Install dependencies with npm/yarn.
-2. Build the bundle with Bun (recommended): `bun run build`. The produced bundle is `dist/thaiqr-cli.js`.
-3. Run the built bundle with Node: `node dist/thaiqr-cli.js <command> ...`
-   - Alternatively, run the TypeScript sources with `ts-node`/`ts-node-esm` if you prefer to avoid building, but the project is set up for bundling with Bun.
+2. Build the bundle with Bun (recommended for development): `bun run build`. The produced bundle is `dist/thaiqr.js`.
+3. For local testing you can run the lightweight wrapper which will prefer the built bundle and fall back to source when available:
+
+```bash
+# run the local wrapper (development-only)
+node bin/thaiqr --help
+```
+
+For end users, there is no need to run `node dist/thaiqr.js` or `bun run decode` — install the package from npm and use the `thaiqr` command instead.
 
 ## Development
 
